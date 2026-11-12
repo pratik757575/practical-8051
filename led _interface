@@ -1,0 +1,42 @@
+#include <reg51.h>
+
+unsigned char led_pattern = 0x01;
+unsigned int timer_count = 0;
+
+void timer0_ISR(void) interrupt 1
+{
+    TH0 = 0xD8;
+    TL0 = 0xF0;
+
+    timer_count++;
+
+    if(timer_count >= 10)
+    {
+        timer_count = 0;
+
+        P1 = led_pattern;
+
+        led_pattern = led_pattern << 1;
+
+        if(led_pattern == 0x00)
+        {
+            led_pattern = 0x01;
+        }
+    }
+}
+
+void main(void)
+{
+    TMOD = 0x01;
+
+    TH0 = 0xD8;
+    TL0 = 0xF0;
+
+    P1 = 0x01;
+
+    ET0 = 1;
+    EA = 1;
+    TR0 = 1;
+
+    while(1);
+}
